@@ -1,0 +1,53 @@
+
+.App {
+  min-height: 100vh;
+
+}
+
+/* holds everything except .nav-bar */
+.content-shell {
+  min-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-bar {
+  height: 6vh;
+}
+
+.entity-list {
+  min-height: 200px;
+  width: fit-content;
+  min-width: 150px;
+  text-align: left;
+  border: solid black;
+}
+
+.auth-page {
+  width: 80vw;
+  display: flex;
+  justify-content: space-around;
+
+}
+
+.login-form {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 1.25vmin;
+}
+
+/* UsersList */
+.users-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.users-list li {
+  list-style: none;
+}
+.user-item-p {
+  margin: 0 auto;
+  display: inline-block;
+}
