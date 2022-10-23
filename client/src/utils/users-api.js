@@ -1,55 +1,22 @@
+import { getToken } from './users-service';
 const BASE_URL = "/api/users";
 
 export async function signUp(userData) {
-  // Fetch uses an options object as a second arg to make requests
-  // other than basic GET requests, include data, headers, etc.
-  const res = await fetch(BASE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    // Fetch requires data payloads to be stringified
-    // and assigned to a body property on the options object
-    body: JSON.stringify(userData),
-  });
-
-  // Check if request was successful
-  if (res.ok) {
-    // res.json() will resolve to the JWT
-    return res.json();
-  } else {
-    throw new Error("Invalid Sign Up");
-  }
+  return sendRequest(BASE_URL, 'POST', userData);
 }
 
 export async function getUsers() {
-  try {
-      const res = await fetch(BASE_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type' : 'application/json'
-        }
-      });
-    
-      if (res.ok) {
-        return res.json();
-      } else {
-        throw new Error(`res not OK. getUsers() failed in users-api (client)`);
-      }
-  } catch (error) {
-    console.log(`getUsers() failed in users-api: ${error}`);
-  }
+  return sendRequest(BASE_URL);
 }
 
-
-export async function logIn() {
-  const res = await fetch(`${BASE_URL}/login`, {
-
-  })
+export async function logIn(credentials) {
+  return sendRequest(`${BASE_URL}/login`, 'POST', credentials);
 }
 
 
 async function sendRequest(url, method = 'GET', payload = null) {
-  // Fetch accepts an options object as the 2nd argument
-  // used to include a data payload, set headers, etc.
+  console.log(`sendRequest payload: ${JSON.stringify(payload)}`)
+
   const options = { method };
   if (payload) {
     options.headers = { 'Content-Type': 'application/json' };
@@ -64,13 +31,14 @@ async function sendRequest(url, method = 'GET', payload = null) {
     options.headers.Authorization = `Bearer ${token}`;
   }
   
+  console.log(`sendRequest token: ${token} url: ${url} options: ${JSON.stringify(options)}`);
   const res = await fetch(url, options);
   // res.ok will be false if the status code set to 4xx in the controller action
   if (res.ok) return res.json()
   else if (res.status === 401) {
     return res.json({ unauthorized: true });
   }
-  throw new Error('Bad Request');
+  throw new Error('Awful Request');
 }
 
 

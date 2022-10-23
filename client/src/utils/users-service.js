@@ -40,13 +40,12 @@ export const getToken = () => {
 
 
 export async function logIn(userData) {
-  console.log(`login (users-service) reached`)
-  const token = await usersAPI.logIn(userData);
-  console.log(`login unauth users-serv: ${JSON.stringify(token)}`)
-  if (token.unauthorized) return 401;
-  console.log(`token return users-service: ${JSON.stringify(token)}`)
-  localStorage.setItem('token', token);
-  return getUser();
+  const data = await usersAPI.logIn(userData);
+
+  if (data.unauthorized) return 401;
+
+  localStorage.setItem("data", JSON.stringify(data));
+  return data;
 }
 
 export const getUser = () => {

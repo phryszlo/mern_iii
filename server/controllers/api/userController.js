@@ -1,5 +1,6 @@
 // IMPORT JSON WEBTOKEN TO ASSIST WITH TOKEN
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs")
 
 // IMPORT USER TO MANIPULATE DATA ON THE DATABASE LEVEL
 const User = require("./../../models/userModel");
@@ -42,22 +43,70 @@ exports.createUser = async (request, response) => {
   }
 };
 
+
+/*
+const passwordEnteredByUser = "mypass123"
+const hash = "$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K"
+
+bcrypt.compare(passwordEnteredByUser, hash, function(error, isMatch) {
+  if (error) {
+    throw error
+  } else if (!isMatch) {
+    console.log("Password doesn't match!")
+  } else {
+    console.log("Password matches!")
+  }
+})
+*/
 exports.login = async (req, res) => {
   try {
-    // isn't this going to let me in with the wrong pwd?
-    const user = await User.findOne({ email: req.body.email });
+    console.log(`controller, login: ${req.body.email}`)
+    // isn't this going to let me in with the wrong pwd? yes
+    // because i don't know how to decrypt or whatnot
+    const user = await User.findOne({ email: req.body.email}); //, password: bcrypt.hash(req.body.password, 12)
     console.log(`user: ${JSON.stringify(user)}`);
-    if (user === null) return res.status(401).json({ unauthorized: true })
-    const token = createJWT(user);
+    console.log(`passrod: ${user.password}`);
 
-    response.status(201).json({
+
+    // this method will not work if select: false is set on the model's password field.
+    // I can't currently understand how the comparePassword mongo method works (and it doesn't)
+    if (await bcrypt.compare(req.body.password, user.password)) {
+      console.log(`they match, says compare`);
+    }
+    else {
+      console.log("they not match. says compare")
+    }
+
+    // const isMatch = user.comparePassword(req.body.password, (matchError, isMatch) => {
+    //   if (matchError) console.log("comparePassword error in userController")
+    //   else if (!isMatch) console.log("Passwords do not match");
+    //   else console.log(`it matched!`)
+    // });
+    // console.log(`isMatch: ${isMatch}`)
+    // if (!isMatch) console.log("Passwords do not match");
+
+    
+    if (user === null) return res.status(401).json({ unauthorized: true })
+    // const token = createJWT(user);
+    console.log(`still alive`)
+    const token = await jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: process.env.JWT_EXPIRATION_DATE,
+      }
+    );
+    console.log(`still alive with token: ${token}`)
+
+    res.status(201).json({
       status: "success",
       data: {
-        newUser,
+        user,
         token,
       },
     });
   } catch (error) {
+    console.log(`error: ${error}`)
     res.status(400).json(error);
   }
 }

@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: [3, "Password must be at least 3 characters long"],
       required: [true, "Password is a required field"],
-      select: false,
+      // select: false,
     },
   },
   {
@@ -36,7 +36,6 @@ const userSchema = new mongoose.Schema(
 // Create a document middleware to encrypt the password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    // Call the next middleware in the stack
     next();
 
     // Return early
@@ -46,9 +45,15 @@ userSchema.pre("save", async function (next) {
   // Encrypt password
   this.password = await bcrypt.hash(this.password, 12);
 
-  // Call the next middleware in the stack
   next();
 });
+
+userSchema.methods.comparePassword = function(candidatePassword, callback) {
+  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+      if (err) return callback(err);
+      callback(null, isMatch);
+  });
+};
 
 // Use mongoose and schema to create user model
 const User = mongoose.model("User", userSchema);

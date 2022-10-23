@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useState } from 'react'
-import { signUp } from "../utils/users-service";
+import { logIn, signUp } from "../utils/users-service";
 
 function LoginForm({ isLogin, setUser }) {
 
@@ -10,35 +10,34 @@ function LoginForm({ isLogin, setUser }) {
   const [confirm, setConfirm] = useState('123');
   const [error, setError] = useState('');
 
-  // useEffect(() => {
-  //   setName('daren')
-  //   setEmail('daren@d.d')
-  //   setPassword('123')
-  //   setConfirm('123')
-  //   setError('')
-  // }, []);
+  useEffect(() => {
+    console.log(`login form islogin?  : ${isLogin}`);
+  }, []);
 
+  // 🔸🔸🔸🔸🔸
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Retrieve state
     // const state = { name, email, password, confirm, error };
     const formData = { name, email, password};
     try {
-      console.log(`submit handler`)
       // const  { confirm, error, ...formData } = state;
+      let user = null;
+      if (isLogin) {
+        user = await logIn(formData)
+      }
+      else {
+        user = await signUp(formData);
+      }
 
-      console.log(`formData=${JSON.stringify(formData)}`);
-
-      const user = await signUp(formData);
-
-      console.log(user);
+      if (user === 401) setError('login unauthorized')
+      console.log('user is ', user);
       setUser(user.data);
     } catch (error) {
-      setError("Sign Up Failed - Try Again");
+      setError(`${isLogin ? 'Login' : 'Sign-up'} Failed - Try Again`);
     }
   }
 
-  // Create a handle change method to keep track of changes inside the form
+  // 🔸🔸🔸🔸🔸
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -59,7 +58,7 @@ function LoginForm({ isLogin, setUser }) {
     <div>
       <div className="form-container">
         <form className="login-form" onSubmit={handleSubmit}>
-          {isLogin && (
+          {!isLogin && (
             <>
               <label htmlFor='name-field'>name:</label>
               <input
@@ -90,7 +89,7 @@ function LoginForm({ isLogin, setUser }) {
             }}
             value={password ? password : ''}
             required />
-          {isLogin && (
+          {!isLogin && (
             <>
               <label htmlFor='confirm-field'>confirm:</label>
               <input
@@ -104,7 +103,7 @@ function LoginForm({ isLogin, setUser }) {
             </>
           )}
           <button type="submit">
-            {!isLogin ? 'Login' : 'Sign Up'}
+            {isLogin ? 'Login' : 'Sign Up'}
           </button>
         </form>
       </div>
