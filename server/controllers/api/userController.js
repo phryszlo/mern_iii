@@ -75,6 +75,7 @@ exports.login = async (req, res) => {
     }
     else {
       console.log("they not match. says compare")
+      return res.status(401).json({ unauthorized: true })
     }
 
     // const isMatch = user.comparePassword(req.body.password, (matchError, isMatch) => {
