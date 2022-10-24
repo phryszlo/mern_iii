@@ -2,17 +2,28 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const cors = require('cors');
+const path = require('path');
+
+
+
 // const favicon = require("serve-favicon");
 // const path = require("path");
-// const cors = require('cors');
 
 const userRouter = require("./routes/api/users");
+const deepartRouter = require("./routes/api/deepart");
 // const userRouter = require("./controllers/api/userController");
 
 require("dotenv").config();
 const PORT = process.env.PORT; // || 5050;
 const app = express();
-// app.use(cors);  
+
+// hey self-person, cors() is a function <<<
+app.use(cors());  
+console.log(`dirname = ${path.join(__dirname , '/public')}`);
+app.use(express.static(path.join(__dirname , '/public')));
+
+
 const DB = mongoose
   .connect(
     process.env.DATABASE.replace("<PASSWORD>", process.env.DATABASE_PASSWORD),
@@ -25,10 +36,13 @@ const DB = mongoose
     console.log("DB CONNECTION SUCCESSFUL!");
   });
 
-  app.use(morgan("dev"));
+  // app.use(morgan("dev"));
+  // app.use(express.json({ limit: '50MB' }));
   app.use(express.json());
+  app.use(express.urlencoded({extended: true}));
   
   app.use("/api/users", userRouter);
+  app.use("/api/deepart", deepartRouter);
 
   app.all("*", (request, response) => {
     response.send("Undefined route");

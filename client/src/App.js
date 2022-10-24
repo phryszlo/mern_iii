@@ -6,6 +6,8 @@ import NavBar from './components/NavBar';
 import AuthPage from './pages/AuthPage';
 import EntityList from './pages/EntityList';
 import UsersList from './components/UsersList';
+import DeepArt from './components/DeepArt';
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,6 +21,7 @@ function App() {
               <Route path="/" element={<EntityList />} />
               <Route path="/entities" element={<EntityList />} />
               <Route path="/users" element={<UsersList />} />
+              <Route path="/deepart" element={<DeepArt />} />
             </Routes>
           </div>
         </>)

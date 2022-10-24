@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="button">fetch</button>
+    <ul id="list"></ul>
+    <script>
+      // const click = async () => {
+      //   await getStyles();
+
+      // }
+
+      window.addEventListener('load', () => {
+        // alert("?");
+        document.getElementById('button').addEventListener('click', getStyles)
+      })
+
+      function getStyles() {
+        console.log('get styles click')
+        fetch('https://api.deeparteffects.com/v1/noauth/styles', {
+          headers: {
+            'content-type': 'application/json',
+            'x-api-key': 'UrpHTqSLVY2ikmUxpK1yU4H10ppiFbWg59uHhuRk',
+          },
+        })
+          .then((response) => {
+            console.log('got response')
+            return response.json()
+          })
+          .then((data) => {
+            console.log('data:', data)
+            const ul = document.getElementById('list')
+            data.styles.map((x) => {
+              // console.log(x.description);
+
+              let li = document.createElement('li')
+              let a = document.createElement('a')
+              let p = document.createElement('p')
+              let img = document.createElement('img')
+
+              a.innerHTML = x.title
+              a.href = x.url
+              a.target = '_blank'
+              a.dataset.id = x.id
+
+              p.innerHTML = x.description
+
+              img.width = '200'
+              img.height = '200'
+              img.src = x.url
+              img.alt = 'style example'
+
+              const form = getUploadForm(x.id)
+
+              li.append(a)
+              li.append(p)
+              li.append(img)
+              li.append(form)
+              li.append(document.createElement('hr'))
+              li.id = `li-${x.id}`
+
+              ul.append(li)
+            })
+          })
+      }
+
+      function getUploadForm(id) {
+        const form = document.createElement('form')
+        const fileInput = document.createElement('input')
+        const button = document.createElement('button')
+
+        fileInput.id = 'file-' + id
+        fileInput.dataset.id = id
+        fileInput.type = 'file'
+        fileInput.addEventListener('change', async (event) => {
+          console.log('change.. ', event.srcElement.id)
+          const file = event.srcElement.files[0]
+          button.disabled = false
+        })
+
+        button.disabled = true
+        button.id = 'button-' + id
+        button.type = 'button'
+        button.dataset.id = id
+        button.innerHTML = 'post'
+
+        button.clickArguments = new Object()
+        button.addEventListener('click', (e) => {
+          postClick(e, form)
+        })
+
+        form.append(fileInput)
+        form.append(button)
+        return form
+      }
+
+      function postClick(event, form) {
+        console.log(
+          document.querySelector(`#file-${event.srcElement.dataset.id}`).id,
+        )
+        console.log(event.srcElement.dataset.id)
+
+        const id = event.srcElement.dataset.id
+        const fileInput = document.querySelector(
+          `#file-${event.srcElement.dataset.id}`,
+        )
+        console.log('fileInput./files[0]', fileInput.files[0])
+
+        const reader = new FileReader()
+        // console.log(`reader result: ${reader.result}`)
+
+        reader.addEventListener('load', (e) => {
+          console.log('result=', reader.result, 'XXXXX')
+          const url = 'https://api.deeparteffects.com/v1/noauth/upload'
+          const body = {
+            styleId: id,
+            imageBase64Encoded: reader.result.substring(
+              reader.result.indexOf(',') + 1,
+            ),
+            imageSize: '512', //Optional
+            // partnerId: "f537a85f-e354-4554-997b-8185dffcab92", //Optional
+            // optimizeForPrint: "true", //Optional
+            // useOriginalColors: "false", //Optional
+          }
+          console.log('body base64', body.imageBase64Encoded, 'ZZZZZ')
+          ;(async () => {
+            const rawResponse = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                'x-api-key': 'UrpHTqSLVY2ikmUxpK1yU4H10ppiFbWg59uHhuRk',
+              },
+              body: JSON.stringify(body),
+            })
+            //we should now have the submission id
+            const content = await rawResponse.json()
+            const sid = content.submissionId
+            console.log(content.submissionId)
+
+            var resultUrl = ''
+            var finished = false
+
+            //after 30 seconds of retrying the GET of the image result URL, just quit.
+            setTimeout(() => {
+              finished = true
+            }, 30000)
+
+            while (resultUrl === '' && !finished) {
+              //this GET should retrieve the url for the altered image
+              const url2 = `https://api.deeparteffects.com/v1/noauth/result?submissionId=${sid}`
+              const cookedResponse = await fetch(url2, {
+                method: 'GET',
+                headers: {
+                  'content-type': 'application/json',
+                  'x-api-key': 'U8nrKWLxSO7pzMfdEt0e04jCa4c6rRsY868E08H4',
+                },
+              })
+
+              const content2 = await cookedResponse.json()
+              console.log(content2)
+              resultUrl = content2.url
+              const img = document.createElement('img')
+              // img.width = "500";
+              // img.height = "auto";
+              img.style.background = '#726870'
+              img.alt = 'image not finished'
+              if (content2.url !== '') {
+                img.src = content2.url
+                finished = true
+                document
+                  .querySelector(`#li-${id}`)
+                  .insertAdjacentElement('beforebegin', img)
+              }
+            }
+          })()
+        })
+
+        const file64 = reader.readAsDataURL(fileInput.files[0])
+      }
+
+      function fileChange(id) {
+        const fi = document.getElementById('file-' + id)
+        if (fi == null) {
+          console.log('null fi')
+
+          return
+        }
+        console.log('now' + id)
+        //  const file = fi.files[0];
+      }
+    </script>
+  </body>
+</html>

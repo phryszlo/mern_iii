@@ -45,9 +45,46 @@
   align-items: center;
 }
 .users-list li {
+  display: flex;
+  justify-content: space-between;
   list-style: none;
+  padding: 0;
+  border: .3px solid deeppink;
 }
 .user-item-p {
+  width: 12em;
+  text-align: left;
+  border-right: .5px solid #288;
+  border-top: none;
   margin: 0 auto;
   display: inline-block;
+  padding: 0.1em .15em 0 .3em;
+}
+.user-item-p:nth-child(2) {
+  border: none;
+}
+
+/* deepart */
+input[type='file'] {
+  display: block;
+  padding: .2em;
+  border: .4px solid gray;
+}
+.deep-art-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.image-details {
+  display: flex;
+  flex-direction: column;
+  margin: 1em 0;
+}
+.image-details p {
+  padding: 0;
+  margin: 0;
+}
+.post-image-btn {
+  margin: 1em 0;
 }
