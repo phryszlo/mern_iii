@@ -56,6 +56,14 @@ router.post('/', upload.single('srcImg'), async (req, res, next) => {
       }
     })
 
+    // WAIT ONE SECOND
+    async function delay(time) {
+      await new Promise(resolve => setTimeout(resolve, time));
+    }
+    console.log(`before delay`);
+    delay(1000); //call this in the while loop
+    console.log(`after delay`);
+
     console.log(`result = ${JSON.stringify(result.data.submissionId)}`);
     // return result.data.submissionId;
 
@@ -68,6 +76,7 @@ router.post('/', upload.single('srcImg'), async (req, res, next) => {
     }, 30000)
 
     while (resultUrl === '' && !finished) {
+      delay(1500);
       const altered = await axios.get(submissionUrl + result.data.submissionId, {
         headers: {
           "x-api-key": "UrpHTqSLVY2ikmUxpK1yU4H10ppiFbWg59uHhuRk" // process.env.DEEPART_API_KEY,

@@ -6,7 +6,7 @@ const STYLES_URL = "https://api.deeparteffects.com/v1/noauth/styles";
 const UPLOAD_URL = "https://api.deeparteffects.com/v1/noauth/upload";
 const RESULT_URL = `https://api.deeparteffects.com/v1/noauth/result?submissionId=${sid}`;
 
-function DeepArt() {
+function DeepArt({setStyle}) {
   const [srcImg, setSrcImg] = useState(null);
   const [resultUrl, setResultUrl] = useState(null);
 

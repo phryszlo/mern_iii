@@ -6,7 +6,7 @@ import NavBar from './components/NavBar';
 import AuthPage from './pages/AuthPage';
 import EntityList from './pages/EntityList';
 import UsersList from './components/UsersList';
-import DeepArt from './components/DeepArt';
+import DeepArt from './components/deep-art/DeepArt';
 
 
 function App() {
